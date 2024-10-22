@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         title: 'Namer App', //diberi judul Namer App
         theme: ThemeData( //data tema apliksi, diberi nama deepOrange
           useMaterial3: true, //versi materialUI yang dipakai versi 3
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 108, 196, 41)),
         ),
         home: MyHomePage(), //nama halaman "MyHomePage" yang menggunakan state "MyAppState"
       ),
@@ -45,13 +45,15 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>(); //widget menggunakan state MyAppState 
-    //
+    var pair = appState.current;  
+
+    
 
     return Scaffold( //base (canvas) dari layout
       body: Column( //diatas scaffold, ada body. body-nya, diberi kolom
         children: [ //didalam kolom, diberi teks
-          Text('A random idea:'),
-          Text(appState.current.asLowerCase), //mengambil random teks dari AppState pada variabel WordPair  current, lalu diubah menjadi huruf kecil  semua, dan ditampilkan sebagi teks
+          Text('A random AWESOME idea:'),
+          BigCard(pair: pair),  //mengambil random teks dari AppState pada variabel WordPair  current, lalu diubah menjadi huruf kecil  semua, dan ditampilkan sebagi teks
           ElevatedButton( //membuat button timbul didalam body
             onPressed: () { //fungsi yg di eksekusi ketika button ditekan
               print('button pressed!'); //tampilkan teks 'button pressed' di terminal saat button ditekan
@@ -59,6 +61,31 @@ class MyHomePage extends StatelessWidget {
             child: Text('Next'), //berikan teks 'Next' pada button (sebagai child) 
           ),
         ],
+      ),
+    );
+  }
+}
+
+class BigCard extends StatelessWidget {
+  const BigCard({
+    super.key,
+    required this.pair,
+  });
+
+  final WordPair pair;
+
+  @override
+  Widget build(BuildContext context) {
+     final theme = Theme.of(context);
+     final style = theme.textTheme.displayMedium!.copyWith(
+      color: theme.colorScheme.onPrimary,
+    );
+
+    return Card( //membungkus padding didalam widget card
+     color: theme.colorScheme.primary,
+     child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Text(pair.asLowerCase),
       ),
     );
   }
