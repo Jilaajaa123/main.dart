@@ -35,8 +35,20 @@ class MyAppState extends ChangeNotifier {
   //state MyAppState diisi dengan 2 kata random yang digabung. kata random tsb disimpan di variable WordPair
   var current = WordPair.random();
     void getNext() {
-    current = WordPair.random();
-    notifyListeners();
+    current = WordPair.random();//acak kata 
+    notifyListeners();//kirim kata yang diacak ke listener untuk ditampilkan di layar
+  }
+  //membuat variable bertipe "list"/daftar bernama favorites untuk menyimpan daftar kata yang di-like
+  var favorites = <WordPair>[];
+  
+   //fungsi untuk menambahkan kata ke dalam, atau menghapus kata dari list favorite
+  void toggleFavorite() {
+    if (favorites.contains(current)) {
+      favorites.remove(current);//menghapus list kata dari list favorite
+    } else {
+      favorites.add(current);//menambahkan kata ke list favorite
+    }
+    notifyListeners();//menempelkan fungsi ini ke button like supaya button like bisa mengetahui jika dirinya ditekan 
   }
 }
 
@@ -47,20 +59,40 @@ class MyHomePage extends StatelessWidget {
     var appState = context.watch<MyAppState>(); //widget menggunakan state MyAppState 
     var pair = appState.current;  
 
-    
+    IconData icon;
+    if (appState.favorites.contains(pair)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
 
     return Scaffold( //base (canvas) dari layout
-      body: Column( //diatas scaffold, ada body. body-nya, diberi kolom
-        children: [ //didalam kolom, diberi teks
-          Text('A random AWESOME idea:'),
-          BigCard(pair: pair),  //mengambil random teks dari AppState pada variabel WordPair  current, lalu diubah menjadi huruf kecil  semua, dan ditampilkan sebagi teks
-          ElevatedButton( //membuat button timbul didalam body
-            onPressed: () { //fungsi yg di eksekusi ketika button ditekan
-              print('button pressed!'); //tampilkan teks 'button pressed' di terminal saat button ditekan
-            },
-            child: Text('Next'), //berikan teks 'Next' pada button (sebagai child) 
-          ),
-        ],
+      body: Center(
+        child: Column( //diatas scaffold, ada body. body-nya, diberi kolom
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [ //didalam kolom, diberi teks
+            BigCard(pair: pair),  //mengambil random teks dari AppState pada variabel WordPair  current, lalu diubah menjadi huruf kecil  semua, dan ditampilkan sebagi teks
+            SizedBox(height: 10),
+            Row(//mengubah layout buttonmenjadi row/baris
+              mainAxisAlignment: MainAxisAlignment.center, //memposisikan 
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    appState.toggleFavorite();
+                  },
+                  icon: Icon(icon),
+                  label: Text('Like'),
+                ),
+                ElevatedButton( //membuat button timbul didalam body
+                  onPressed: () { //fungsi yg di eksekusi ketika button ditekan
+                    print('button pressed!'); //tampilkan teks 'button pressed' di terminal saat button ditekan
+                  },
+                  child: Text('Next'), //berikan teks 'Next' pada button (sebagai child) 
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -76,16 +108,20 @@ class BigCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     final theme = Theme.of(context);
+     final theme = Theme.of(context); //menambahkan tema pada card
+     //membuat styel untuk teks,diberi mama styel.styel warna mengikuti parrent
+
      final style = theme.textTheme.displayMedium!.copyWith(
       color: theme.colorScheme.onPrimary,
     );
 
     return Card( //membungkus padding didalam widget card
-     color: theme.colorScheme.primary,
+     color: theme.colorScheme.primary, 
+
      child: Padding(
         padding: const EdgeInsets.all(20),
         child: Text(pair.asLowerCase),
+        //mengubah kata dalam pair menjadi huruf kecil
       ),
     );
   }
